@@ -1,0 +1,213 @@
+{% extends "admin/index.html" %}
+{% load i18n static admin_dashboard_tags %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'admin/css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    {% if show_dashboard %}
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+        <h1>{% trans 'Dashboard' %}</h1>
+        <div class="dashboard-actions">
+            <a href="{% url 'admin:products_product_add' %}" class="button">
+                <i class="fas fa-plus"></i> {% trans 'Add Product' %}
+            </a>
+            <a href="{% url 'admin:products_order_add' %}" class="button">
+                <i class="fas fa-plus"></i> {% trans 'Add Order' %}
+            </a>
+            <a href="{% url 'admin:products_category_add' %}" class="button">
+                <i class="fas fa-plus"></i> {% trans 'Add Category' %}
+            </a>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="dashboard-stats">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-shopping-cart"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{% trans 'Total Orders' %}</h3>
+                <p class="stat-number">{{ metrics.total_orders }}</p>
+                <p class="stat-change {% if metrics.total_orders_trend > 0 %}positive{% else %}negative{% endif %}">
+                    {{ metrics.total_orders_trend|floatformat:1 }}% from last period
+                </p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-dollar-sign"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{% trans 'Total Revenue' %}</h3>
+                <p class="stat-number">${{ metrics.total_revenue|floatformat:2 }}</p>
+                <p class="stat-change {% if metrics.revenue_trend > 0 %}positive{% else %}negative{% endif %}">
+                    {{ metrics.revenue_trend|floatformat:1 }}% from last period
+                </p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{% trans 'Total Customers' %}</h3>
+                <p class="stat-number">{{ metrics.total_customers }}</p>
+                <p class="stat-change {% if metrics.customer_trend > 0 %}positive{% else %}negative{% endif %}">
+                    {{ metrics.customer_trend|floatformat:1 }}% from last period
+                </p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-box"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{% trans 'Products' %}</h3>
+                <p class="stat-number">{{ metrics.total_products }}</p>
+                <p class="stat-change">
+                    <span class="{% if metrics.low_stock_products > 0 %}warning{% endif %}">
+                        {{ metrics.low_stock_products }} low stock
+                    </span>
+                    <span class="danger">
+                        {{ metrics.out_of_stock_products }} out of stock
+                    </span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="dashboard-content">
+        <!-- Recent Orders -->
+        <div class="dashboard-section">
+            <div class="section-header">
+                <h2>{% trans 'Recent Orders' %}</h2>
+                <a href="{% url 'admin:products_order_changelist' %}" class="view-all">{% trans 'View All' %}</a>
+            </div>
+            <div class="section-content">
+                {% if recent_orders %}
+                <table class="dashboard-table">
+                    <thead>
+                        <tr>
+                            <th>{% trans 'Order #' %}</th>
+                            <th>{% trans 'Customer' %}</th>
+                            <th>{% trans 'Date' %}</th>
+                            <th>{% trans 'Status' %}</th>
+                            <th>{% trans 'Total' %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in recent_orders %}
+                        <tr>
+                            <td><a href="{% url 'admin:products_order_change' order.id %}">#{{ order.id }}</a></td>
+                            <td>{{ order.user.get_full_name|default:order.user.email }}</td>
+                            <td>{{ order.created_at|date:"M d, Y" }}</td>
+                            <td><span class="status-badge {{ order.status }}">{{ order.get_status_display }}</span></td>
+                            <td>${{ order.total_amount|floatformat:2 }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p>{% trans 'No recent orders found.' %}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Top Products -->
+        <div class="dashboard-section">
+            <div class="section-header">
+                <h2>{% trans 'Top Selling Products' %}</h2>
+                <a href="{% url 'admin:products_product_changelist' %}" class="view-all">{% trans 'View All' %}</a>
+            </div>
+            <div class="section-content">
+                {% if top_products %}
+                <table class="dashboard-table">
+                    <thead>
+                        <tr>
+                            <th>{% trans 'Product' %}</th>
+                            <th>{% trans 'Price' %}</th>
+                            <th>{% trans 'Sold' %}</th>
+                            <th>{% trans 'Revenue' %}</th>
+                            <th>{% trans 'Stock' %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in top_products %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'admin:products_product_change' product.id %}">
+                                    {{ product.name|truncatechars:40 }}
+                                </a>
+                            </td>
+                            <td>${{ product.price|floatformat:2 }}</td>
+                            <td>{{ product.order_count }} {% trans 'sold' %}</td>
+                            <td>${{ product.revenue|default:0|floatformat:2 }}</td>
+                            <td>
+                                <div class="stock-indicator">
+                                    <div class="stock-bar" style="width: {% widthratio product.quantity 100 100 %}%"></div>
+                                    <span>{{ product.quantity }} {% trans 'in stock' %}</span>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p>{% trans 'No product data available.' %}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% else %}
+        {{ block.super }}
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block sidebar %}
+{{ block.super }}
+{% if show_dashboard %}
+<div id="content-related">
+    <div class="module">
+        <h2>{% trans 'Quick Actions' %}</h2>
+        <ul class="action-list">
+            <li><a href="{% url 'admin:products_product_add' %}" class="addlink">{% trans 'Add Product' %}</a></li>
+            <li><a href="{% url 'admin:products_category_add' %}" class="addlink">{% trans 'Add Category' %}</a></li>
+            <li><a href="{% url 'admin:products_order_add' %}" class="addlink">{% trans 'Create Order' %}</a></li>
+            <li><a href="{% url 'admin:accounts_user_add' %}" class="addlink">{% trans 'Add User' %}</a></li>
+        </ul>
+    </div>
+    
+    <div class="module">
+        <h2>{% trans 'Recent Activity' %}</h2>
+        <ul class="action-list">
+            {% for log in recent_activity %}
+            <li class="activity-item">
+                <span class="activity-icon {{ log.action_flag }}">
+                    <i class="fas fa-{{ log.get_action_flag_icon }}"></i>
+                </span>
+                <div class="activity-details">
+                    <div class="activity-message">{{ log.get_change_message }}</div>
+                    <div class="activity-meta">
+                        {{ log.user.get_username }} - {{ log.action_time|timesince }} ago
+                    </div>
+                </div>
+            </li>
+            {% empty %}
+            <li>{% trans 'No recent activity' %}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,172 @@
+/* Main Layout */
+body {
+    background-color: #f5f7fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Sidebar */
+#sidebar-wrapper {
+    min-height: 100vh;
+    background: #343a40;
+    color: #fff;
+    transition: all 0.3s;
+}
+
+#sidebar-wrapper .sidebar-heading {
+    padding: 20px;
+    background: #2c3136;
+}
+
+#sidebar-wrapper .list-group-item {
+    border: none;
+    border-radius: 0;
+    padding: 15px 20px;
+    color: #adb5bd;
+    transition: all 0.3s;
+}
+
+#sidebar-wrapper .list-group-item:hover,
+#sidebar-wrapper .list-group-item.active {
+    background: #2c3136;
+    color: #fff;
+    border-left: 3px solid #4e73df;
+}
+
+#sidebar-wrapper .list-group-item i {
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+}
+
+/* Top Navigation */
+.navbar {
+    background: #fff !important;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+    padding: 0.5rem 1rem;
+}
+
+.navbar .btn {
+    padding: 0.25rem 0.75rem;
+}
+
+/* Cards */
+.card {
+    border: none;
+    border-radius: 0.35rem;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+    margin-bottom: 1.5rem;
+}
+
+.card-header {
+    background-color: #f8f9fc;
+    border-bottom: 1px solid #e3e6f0;
+    padding: 1rem 1.25rem;
+    font-weight: 600;
+    color: #4e73df;
+}
+
+/* Stats Cards */
+.card-stats {
+    border-left: 0.25rem solid #4e73df;
+}
+
+.card-stats .card-body {
+    padding: 1.25rem;
+}
+
+.card-stats .card-title {
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.card-stats .card-text {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.card-stats small {
+    color: #b7b9cc;
+    font-size: 0.8rem;
+}
+
+/* Tables */
+.table {
+    margin-bottom: 0;
+}
+
+.table thead th {
+    border-top: none;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #4e73df;
+    padding: 0.75rem 1rem;
+}
+
+.table td {
+    padding: 0.75rem 1rem;
+    vertical-align: middle;
+    border-top: 1px solid #e3e6f0;
+}
+
+/* Badges */
+.badge {
+    font-weight: 500;
+    padding: 0.35em 0.65em;
+    font-size: 0.75em;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge.bg-primary {
+    background-color: #4e73df !important;
+}
+
+.badge.bg-success {
+    background-color: #1cc88a !important;
+}
+
+.badge.bg-warning {
+    background-color: #f6c23e !important;
+}
+
+.badge.bg-danger {
+    background-color: #e74a3b !important;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .table-responsive {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
