@@ -1,130 +1,312 @@
-{% extends 'admin_dashboard/base.html' %}
+{% extends "admin_dashboard/base_simple.html" %}
+{% load i18n static %}
 
-{% block title %}Login - Admin Dashboard{% endblock %}
+{% block title %}{% translate 'Log in' %} | {{ site_title|default:_('E-Commerce Admin') }}{% endblock %}
+
+{% block extrastyle %}
+<style>
+    :root {
+        --primary-color: #4e73df;
+        --primary-hover: #2e59d9;
+        --light-color: #f8f9fc;
+        --dark-color: #5a5c69;
+    }
+    
+    body {
+        background: linear-gradient(135deg, #f8f9fc 0%, #e9ecef 100%) !important;
+        min-height: 100vh;
+        margin: 0;
+        font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
+    
+    .login-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 1rem;
+    }
+    
+    .login-card {
+        border: none;
+        border-radius: 0.75rem;
+        box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1);
+        max-width: 420px;
+        width: 100%;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .login-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.15);
+    }
+    
+    .login-card .card-header {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+        color: white;
+        border: none;
+        padding: 1.75rem 2rem;
+        text-align: center;
+    }
+    
+    .login-card .card-header h3 {
+        font-weight: 700;
+        margin: 0;
+        font-size: 1.5rem;
+    }
+    
+    .login-card .card-body {
+        padding: 2.5rem;
+        background: white;
+    }
+    
+    .form-floating {
+        margin-bottom: 1.25rem;
+    }
+    
+    .form-floating > label {
+        color: #6c757d;
+        padding: 1rem 0.75rem;
+        font-size: 0.9rem;
+    }
+    
+    .form-control {
+        height: calc(3.25rem + 2px);
+        padding: 1rem 0.75rem;
+        font-size: 0.95rem;
+        border: 1px solid #d1d3e2;
+        border-radius: 0.5rem;
+        transition: all 0.3s;
+    }
+    
+    .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.25rem rgba(78, 115, 223, 0.25);
+    }
+    
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        font-size: 0.95rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-radius: 0.5rem;
+        transition: all 0.3s;
+    }
+    
+    .btn-primary:hover {
+        background-color: var(--primary-hover);
+        border-color: var(--primary-hover);
+        transform: translateY(-1px);
+    }
+    
+    .forgot-password {
+        color: var(--primary-color);
+        text-decoration: none;
+        font-size: 0.85rem;
+        transition: all 0.2s;
+    }
+    
+    .forgot-password:hover {
+        color: var(--primary-hover);
+        text-decoration: underline;
+    }
+    
+    .back-to-home {
+        color: var(--dark-color);
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+    }
+    
+    .back-to-home:hover {
+        color: var(--primary-color);
+    }
+    
+    .alert {
+        border-radius: 0.5rem;
+        border: none;
+        padding: 1rem 1.25rem;
+    }
+    
+    .form-check-input:checked {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+    
+    .form-check-input:focus {
+        box-shadow: 0 0 0 0.25rem rgba(78, 115, 223, 0.25);
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-4">
-            <div class="card shadow-lg border-0 rounded-lg mt-5">
-                <div class="card-header">
-                    <h3 class="text-center font-weight-light my-4">Admin Login</h3>
-                </div>
-                <div class="card-body">
-                    {% if form.errors %}
-                    <div class="alert alert-danger" role="alert">
-                        <strong>Error!</strong> Please enter a correct email and password. Note that both fields may be case-sensitive.
+<div class="login-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-8 col-lg-6">
+                <div class="card login-card">
+                    <div class="card-header text-center">
+                        <h3 class="h4 mb-0">
+                            <i class="fas fa-lock me-2"></i>{% translate 'Admin Sign In' %}
+                        </h3>
+                        <p class="mb-0 mt-2 small">E-Commerce Admin Dashboard</p>
                     </div>
-                    {% endif %}
-                    
-                    <form method="post" action="{% url 'admin:login' %}" class="needs-validation" novalidate>
-                        {% csrf_token %}
-                        <input type="hidden" name="next" value="{{ next }}">
+                    <div class="card-body p-4">
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
                         
-                        <div class="form-floating mb-3">
-                            <input class="form-control" id="id_username" type="email" name="username" required>
-                            <label for="id_username">Email address</label>
-                            <div class="invalid-feedback">
-                                Please enter your email address.
+                        {% if user.is_authenticated %}
+                            <div class="alert alert-warning mb-4" role="alert">
+                                {% blocktranslate with username=user.get_username %}
+                                    You are already logged in as {{ username }}. 
+                                {% endblocktranslate %}
+                                <a href="{% url 'admin_dashboard:admin_logout' %}" class="alert-link">Logout</a> to sign in with a different account.
                             </div>
-                        </div>
-                        
-                        <div class="form-floating mb-3">
-                            <input class="form-control" id="id_password" type="password" name="password" required>
-                            <label for="id_password">Password</label>
-                            <div class="invalid-feedback">
-                                Please enter your password.
+                        {% endif %}
+
+                        {% if messages %}
+                            {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show mb-4" role="alert">
+                                <i class="fas {% if message.tags == 'success' %}fa-check-circle{% else %}fa-exclamation-circle{% endif %} me-2"></i>
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{% translate 'Close' %}"></button>
                             </div>
-                        </div>
-                        
-                        <div class="d-flex align-items-center justify-content-between mt-4 mb-0">
-                            <a class="small" href="{% url 'password_reset' %}">Forgot Password?</a>
-                            <button type="submit" class="btn btn-primary">Login</button>
-                        </div>
-                    </form>
-                </div>
-                <div class="card-footer text-center py-3">
-                    <div class="small">
-                        <a href="{% url 'home' %}">Back to Home</a>
+                            {% endfor %}
+                        {% endif %}
+
+                        <form method="post" action="{% url 'admin_dashboard:login' %}" class="mt-4">
+                            {% csrf_token %}
+                            <input type="hidden" name="next" value="{{ next|default:request.GET.next }}">
+                            
+                            <div class="form-floating mb-3">
+                                <input type="text" 
+                                       name="username" 
+                                       id="id_username" 
+                                       class="form-control {% if form.username.errors %}is-invalid{% endif %}" 
+                                       placeholder="{% translate 'Username or Email' %}" 
+                                       required
+                                       autofocus>
+                                <label for="id_username">{% translate 'Username or Email' %}</label>
+                                {% if form.username.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.username.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="form-floating mb-4">
+                                <input type="password" 
+                                       name="password" 
+                                       id="id_password" 
+                                       class="form-control {% if form.password.errors %}is-invalid{% endif %}" 
+                                       placeholder="{% translate 'Password' %}" 
+                                       required>
+                                <label for="id_password">{% translate 'Password' %}</label>
+                                {% if form.password.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.password.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="remember-me" id="remember-me" name="remember_me">
+                                    <label class="form-check-label small" for="remember-me">
+                                        {% translate 'Remember me' %}
+                                    </label>
+                                </div>
+                                <a href="{% url 'admin_dashboard:password_reset' %}" class="text-decoration-none small text-muted">
+                                    <i class="fas fa-key me-1"></i>{% translate 'Forgot password?' %}
+                                </a>
+                            </div>
+
+                            <button class="btn btn-primary w-100 py-3 mb-3 fw-bold" type="submit">
+                                <i class="fas fa-sign-in-alt me-2"></i>{% translate 'Sign in' %}
+                            </button>
+
+                            <div class="text-center mt-4 pt-3 border-top">
+                                <a href="/" class="text-decoration-none small text-muted">
+                                    <i class="fas fa-home me-1"></i> {% translate 'Back to Homepage' %}
+                                </a>
+                            </div>
+                        </form>
                     </div>
+                </div>
+                
+                <div class="text-center mt-4">
+                    <p class="text-muted small">
+                        &copy; {% now "Y" %} {{ site_title|default:'E-Commerce' }}. {% translate 'All rights reserved.' %}
+                    </p>
                 </div>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
 
-<style>
-body {
-    background-color: #f8f9fc;
-}
-
-.card {
-    border: none;
-    border-radius: 0.5rem;
-}
-
-.card-header {
-    background-color: #4e73df;
-    color: white;
-    border-radius: 0.5rem 0.5rem 0 0 !important;
-    padding: 1.5rem;
-}
-
-.card-header h3 {
-    margin-bottom: 0;
-    font-weight: 300;
-}
-
-.form-floating > label {
-    padding: 1rem 0.75rem;
-}
-
-.form-control:focus {
-    border-color: #bac8f3;
-    box-shadow: 0 0 0 0.25rem rgba(78, 115, 223, 0.25);
-}
-
-.btn-primary {
-    background-color: #4e73df;
-    border-color: #4e73df;
-    padding: 0.5rem 1.5rem;
-}
-
-.btn-primary:hover {
-    background-color: #2e59d9;
-    border-color: #2653d4;
-}
-
-.small a {
-    color: #4e73df;
-    text-decoration: none;
-}
-
-.small a:hover {
-    text-decoration: underline;
-}
-</style>
-
+{% block extra_js %}
 <script>
-// Form validation
-(function () {
-    'use strict'
+// Enhanced form validation with better UX
+document.addEventListener('DOMContentLoaded', function() {
+    'use strict';
     
-    // Fetch all the forms we want to apply custom Bootstrap validation styles to
-    var forms = document.querySelectorAll('.needs-validation')
+    // Fetch all forms with validation
+    const forms = document.querySelectorAll('.needs-validation');
     
-    // Loop over them and prevent submission
-    Array.prototype.slice.call(forms)
-        .forEach(function (form) {
-            form.addEventListener('submit', function (event) {
-                if (!form.checkValidity()) {
-                    event.preventDefault()
-                    event.stopPropagation()
+    // Add validation to each form
+    Array.from(forms).forEach(form => {
+        // Add real-time validation on input
+        form.querySelectorAll('input').forEach(input => {
+            input.addEventListener('input', function() {
+                if (input.checkValidity()) {
+                    input.classList.remove('is-invalid');
+                    input.classList.add('is-valid');
+                } else {
+                    input.classList.add('is-invalid');
                 }
+            });
+        });
+        
+        // Validate on submit
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
                 
-                form.classList.add('was-validated')
-            }, false)
-        })
-})()
+                // Add validation to all required fields
+                form.querySelectorAll(':required').forEach(field => {
+                    if (!field.value.trim()) {
+                        field.classList.add('is-invalid');
+                    }
+                });
+            }
+            
+            form.classList.add('was-validated');
+        });
+    });
+    
+    // Add focus styles for better accessibility
+    document.querySelectorAll('input, button, a').forEach(element => {
+        element.addEventListener('focus', function() {
+            this.style.outline = '2px solid #4e73df';
+            this.style.outlineOffset = '2px';
+        });
+        
+        element.addEventListener('blur', function() {
+            this.style.outline = 'none';
+        });
+    });
+});
 </script>
 {% endblock %}

@@ -170,6 +170,7 @@ class ProductOptionAdmin(admin.ModelAdmin):
     readonly_fields = ('created_at',)
 
 
+# Register models with the admin site
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Review, ReviewAdmin)

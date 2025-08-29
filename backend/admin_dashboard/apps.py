@@ -1,5 +1,6 @@
 from django.apps import AppConfig
 from django.conf import settings
+from django.contrib import admin
 
 
 class AdminDashboardConfig(AppConfig):
@@ -7,6 +8,13 @@ class AdminDashboardConfig(AppConfig):
     name = 'admin_dashboard'
     
     def ready(self):
+        # Import the custom admin site
+        from .admin import admin_site
+        
+        # Set the default admin site
+        admin.site = admin_site
+        admin.sites.site = admin_site
+        
         # Add our middleware to the settings
         self._add_middleware()
         
